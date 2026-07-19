@@ -1,0 +1,67 @@
+package fr.pandamcbe.duel.duelmanager.runnables;
+
+import fr.pandamcbe.duel.Duel;
+import fr.pandamcbe.duel.arenas.DuelArena;
+import fr.pandamcbe.duel.arenas.DuelArenaManager;
+import fr.pandamcbe.duel.duelmanager.GiveKitsUtils;
+import fr.pandamcbe.duel.scoreboards.samaboardsclasses.PersonalScoreboard;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.UUID;
+
+public class DuelsRunnable extends BukkitRunnable {
+
+    private int timer = 6;
+
+    public int getTimer() {
+        return timer;
+    }
+
+    private final DuelArena arena;
+    private final Duel duel;
+    private final DuelArenaManager arenaManager = Duel.getInstance().arenaManager;
+    public DuelsRunnable(DuelArena arena, Duel main){
+        this.arena = arena;
+        duel = main;
+    }
+
+    @Override
+    public void run() {
+
+            new CountDownsManager(arena).runNewRound(this, duel.getArenas.getArenaList(), duel.waitingPlayers, timer, Sound.CLICK, Sound.NOTE_PLING);
+
+//            if(timer != 0) Bukkit.getScheduler().runTask(Duel.getInstance(), ()->ArenaManager.Teleport(GameArena));
+                if(timer == 5) {
+                    for (UUID uuid : arena.getAlluuids()) {
+                        Player p = Bukkit.getPlayer(uuid);
+                        Duel.getInstance().getScoreboardManager().onLogin(new PersonalScoreboard(p), p);
+                        arenaManager.clearStuffandHealth(p);
+                        p.setGameMode(GameMode.SURVIVAL);
+                        Duel.getInstance().frozens.add(p);
+                        p.sendTitle("§6§lLancement dans:", "§c§l5");
+                    }
+                } else if (timer == 0) {
+                    Duel.getInstance().getArenaManager().placingBedInTeamsLoc(arena);
+                    for (UUID uuid : arena.getAlluuids()) {
+                        Player p = Bukkit.getPlayer(uuid);
+                        for (Entity entity : arena.getMiddlespawn().getWorld().getNearbyEntities(p.getLocation(), 20, 30, 20)) {
+                            if (entity instanceof Item)
+                                entity.remove();
+                        }
+                        p.sendMessage("§b§lGO!!");
+                        p.playSound(p.getLocation(), Sound.NOTE_PLING, 1.0f, 1.0f);
+                        new GiveKitsUtils(arena, p);
+                        Duel.getInstance().frozens.remove(p);
+                    }
+                }
+
+            timer--;
+        }
+
+}
