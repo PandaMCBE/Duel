@@ -1,33 +1,39 @@
 package fr.pandamcbe.duel.arenas;
 
+import fr.pandamcbe.commons.DuelAccount;
 import fr.pandamcbe.duel.Duel;
 import fr.pandamcbe.duel.duelmanager.GiveKitsUtils;
 import fr.pandamcbe.duel.duelmanager.runnables.DuelsRunnable;
+import fr.pandamcbe.mGConstructorAPI.MGConstructorAPI;
+import fr.pandamcbe.mGConstructorAPI.Team;
 import fr.pandamcbe.mGConstructorAPI.arenas.Arena;
 import fr.pandamcbe.mGConstructorAPI.arenas.State;
-import fr.pandamcbe.mGConstructorAPI.arenas.Team;
-import fr.pandamcbe.mGConstructorAPI.managers.ArenaManager;
-import org.bukkit.*;
+import fr.pandamcbe.mGConstructorAPI.managers.DuelPlayerManager;
+import fr.pandamcbe.mGConstructorAPI.managers.GameSessionManager;
+import fr.pandamcbe.mgapi.Main;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
-public class DuelArenaManager extends ArenaManager {
+public class DuelArenaManager extends DuelPlayerManager {
     //La classe est appelée dans l'onEnable donc tout ce qui est hors des méthodes est exécuté au démarrage du plugin
 
-    @Override
-    public void onPlayersJoin(List<UUID> list, List<Arena> list1, Player p, String s) {
+    private final Team team = MGConstructorAPI.getInstance().getTeam();
+    private final GameSessionManager gameSessionManager = MGConstructorAPI.getInstance().getGameManager();
 
+    public void customJoinEvent(Player player){
+        gameSessionManager.onPlayersJoin(player);
+        List<Arena> arenaList = Duel.getInstance().getArenas.getArenaList();
+        DuelAccount duelAccount = (DuelAccount) Main.getInstance().manipulation.getAccountFromMemory(Duel.getInstance().mainMap, player.getUniqueId(), DuelAccount.class.getName());
+        lookForArena(arenaList, duelAccount, player);
     }
-
-
 
     public void JoinArena(UUID uuid, DuelArena nextArena){
         Player player = Bukkit.getPlayer(uuid);
@@ -38,11 +44,10 @@ public class DuelArenaManager extends ArenaManager {
                     nextArena.getAlluuids().add(uuid);
                     System.out.println("ListPlayer: " + nextArena.getAlluuids().size() + " : " + nextArena.getAlluuids());
                 }
-            Team team = getNextTeam(nextArena, nextArena.getTotalTeams());
-            team.getUuidList().add(uuid);
+            team.addPlayer(nextArena, player);
 
                 if (!nextArena.isStarted() && nextArena.getAlluuids().size() == 2) {
-                    Teleport(nextArena);
+                    gameSessionManager.teleport(nextArena);
                     DuelsRunnable start = new DuelsRunnable(nextArena, Duel.getInstance());
                     nextArena.setState(State.PLAYING);
                     start.runTaskTimer(Duel.getInstance(), 0, 20);
@@ -56,9 +61,9 @@ public class DuelArenaManager extends ArenaManager {
 
 
     public void placingBedInTeamsLoc(DuelArena arena){
-        System.out.println("Blue bed: "+ arena.getBlue_bed() + " Red bed: "+ arena.getRed_bed());
-        if(arena.getRed_bed().getBlock() != null) {
-            BlockState bedFoot = arena.getBlue_bed().getBlock().getRelative(arena.getBlue_bed().getBlock().getFace(arena.getBlue_bed().getBlock())).getState();
+        if(arena.getGoalByTeam().get(ChatColor.BLUE).getBlock() != null) {
+            Block blue_bed = arena.goalByTeam.get(ChatColor.BLUE).getBlock();
+            BlockState bedFoot = blue_bed.getRelative(blue_bed.getFace(blue_bed)).getState();
             BlockState bedHead = bedFoot.getBlock().getRelative(BlockFace.SOUTH).getState();
             bedFoot.setType(Material.BED_BLOCK);
             bedHead.setType(Material.BED_BLOCK);
@@ -70,8 +75,9 @@ public class DuelArenaManager extends ArenaManager {
 
 //        BlockState bedFoot2 = arena.getRed_bed().getBlock().getRelative(arena.getRed_bed().getBlock().getFace(arena.getRed_bed().getBlock())).getState();
 //        BlockState bedHead2 = bedFoot.getBlock().getRelative(BlockFace.SOUTH).getState();
-        if(arena.getBlue_bed().getBlock() != null) {
-            BlockState bedHead2 = arena.getRed_bed().getBlock().getRelative(arena.getRed_bed().getBlock().getFace(arena.getRed_bed().getBlock())).getState();
+        if(arena.getGoalByTeam().get(ChatColor.RED).getBlock() != null) {
+            Block red_bed = arena.goalByTeam.get(ChatColor.RED).getBlock();
+            BlockState bedHead2 = red_bed.getRelative(red_bed.getFace(red_bed)).getState();
             BlockState bedFoot2 = bedHead2.getBlock().getRelative(BlockFace.NORTH).getState();
             bedFoot2.setType(Material.BED_BLOCK);
             bedHead2.setType(Material.BED_BLOCK);
@@ -84,90 +90,24 @@ public class DuelArenaManager extends ArenaManager {
 
     //---------------------------<MLGRUSH
 
-    public DuelArena getNextArena(String playersDuelMode) { //Récupérer une arène non démarrée
-        for (Arena arena : Duel.getInstance().getArenas.getArenaList()) { //Pour chaque objet Arena qui sont dans la liste définie de toutes les arènes existantes
-            DuelArena duelArena = (DuelArena) arena;
-            if(duelArena.getDuelMode().equalsIgnoreCase(playersDuelMode)) { //Si le nom du mode de duel de l'arène correspond à celui que le joueur est en train de jouer
-                if (!duelArena.isStarted() && duelArena.getAlluuids().isEmpty()) { //Si l'arène n'est pas démarrée
-                    return duelArena; //retourner l'arène une arène non démarrée qui correspond au mode de duel du joueur
-                }
-            }
+    public void respawning(Arena arena, Player player){
+        DuelArena duelArena = (DuelArena) arena;
+        if (team.getSpecificTeam(duelArena, ChatColor.RED).getUuidList().contains(player.getUniqueId())) {
+            player.teleport(duelArena.getSpawnByTeam().get(ChatColor.RED));
         }
-        return null; //retourner null par défaut si aucune arène n'est disponible
+        if (team.getSpecificTeam(duelArena, ChatColor.BLUE).getUuidList().contains(player.getUniqueId())) {
+            player.teleport(duelArena.getSpawnByTeam().get(ChatColor.BLUE));
+        }
+
+        new GiveKitsUtils(duelArena, player);
     }
 
-    @Override
-    public void onDeath(List<UUID> list, List<Arena> list1, Arena arena, GameMode mode, int i, int i1, Player player) {
-        DuelArena duelArena = (DuelArena) arena;
-        if (duelArena != null) {
-            player.teleport(arena.getMiddlespawn());
-            player.setGameMode(GameMode.SPECTATOR);
-            player.getInventory().clear();
-
-            new BukkitRunnable() {
-                int timer = i;
-
-                @Override
-                public void run() {
-
-                    if(!player.isOnline()){
-                        cancel();
-                        Duel.getInstance().arenaManager.whenPlayerDisconnects(player, duelArena, list1, list);
-                        return;
-                    }
-                    if (timer >= 1) {
-                        player.sendMessage("§cRespawn dans :" + timer);
-
-                    } else {
-
-                        if (getSpecificTeam(duelArena, ChatColor.RED).getUuidList().contains(player.getUniqueId())) {
-                            player.teleport(duelArena.getLocByTeam().get(ChatColor.RED));
-                        }
-                        if (getSpecificTeam(duelArena, ChatColor.BLUE).getUuidList().contains(player.getUniqueId())) {
-                            player.teleport(duelArena.getLocByTeam().get(ChatColor.BLUE));
-                        }
-                        player.setGameMode(mode);
-                        new GiveKitsUtils(duelArena, player);
-
-                        cancel();
-                    }
-                    timer--;
-                }
-
-            }.runTaskTimer(Duel.getInstance(), 20L, 20L);
-        } else System.out.println("arena est null");
+    public void playerQuits(Arena arena, Player player){
+        List<Arena> arenaList = Duel.getInstance().getArenas.getArenaList();
+        whenPlayerDisconnects(player, arena, arenaList);
     }
 
-    @Override
-    public void whenPlayerDisconnects(Player leaver, Arena arena, List<Arena> list, List<UUID> list1) {
-        DuelArena duelArena = (DuelArena) arena;
-        Duel.getInstance().getScoreboardManager().onLogout(leaver);
-        if (duelArena != null) {
-            duelArena.getAlluuids().remove(leaver.getUniqueId());
-            duelArena.getInGamePlayers().remove(leaver.getUniqueId());
-            if (duelArena.getAlluuids().size() == 1) {
-                UUID winnerUUID = duelArena.getAlluuids().get(0);
-                Player winner = Bukkit.getPlayer(winnerUUID);
-                if (winner.isOnline()) {
-                    Team team = getTeamByPlayer(winner, duelArena);
-                    team.getUuidList().remove(winnerUUID);
-                    ByteArrayOutputStream a = new ByteArrayOutputStream();
-                    DataOutputStream out3 = new DataOutputStream(a);
-                    try {
-                        out3.writeUTF("Connect");
-                        out3.writeUTF("Lobby");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    winner.sendPluginMessage(Duel.getInstance(), "BungeeCord", a.toByteArray());
-
-                }
-                breakingPlacedBlocks(duelArena);
-                getTeamByPlayer(leaver, duelArena).getUuidList().remove(leaver.getUniqueId());
-                if (duelArena.isStarted()) {
-                    duelArena.restart();
-                }
-            }
-        }
+    public void breakOrPlace(Arena arena) {
+        MGConstructorAPI.getInstance().getArenaManager().breakingPlacedBlocks(arena);
     }
 }

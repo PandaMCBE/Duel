@@ -6,7 +6,7 @@ import fr.pandamcbe.duel.arenas.getArenas;
 import fr.pandamcbe.duel.commands.StatCommand;
 import fr.pandamcbe.duel.listeners.ArenaListeners;
 import fr.pandamcbe.duel.listeners.GameJoinListener;
-import fr.pandamcbe.duel.rediscommunication.RPbSbUtils;
+import fr.pandamcbe.duel.rediscommunication.RedisSubCatch;
 import fr.pandamcbe.mgapi.serverutilapi.scoreboards.ScoreboardManager;
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
@@ -28,7 +28,7 @@ public class Duel extends JavaPlugin {
     public Set<Player> frozens = new HashSet<>();
     public List<UUID> waitingPlayers;
     public Map<UUID, Map<String, Object>> mainMap;
-    public RPbSbUtils subToChannels;
+    public RedisSubCatch subToChannels;
 
     private ScheduledExecutorService executorMonoThread;
     private ScheduledExecutorService scheduledExecutorService;
@@ -68,13 +68,12 @@ public class Duel extends JavaPlugin {
         mainMap = new HashMap<>();
         waitingPlayers = new ArrayList<>();
 
-        subToChannels = new RPbSbUtils();
+        subToChannels = new RedisSubCatch();
 
     }
 
     public void onDisable(){
         this.scoreboardManager.onDisable();
-        subToChannels.sendAccountsToProxy(this);
     }
 
     public static Duel getInstance() {

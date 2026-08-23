@@ -10,7 +10,7 @@
         <version>dev-SNAPSHOT</version>
     </parent>
 
-    <artifactId>Duel</artifactId>
+    <artifactId>duel</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
 
@@ -43,4 +43,12 @@
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/PandaMCBE/Duel</url>
+        </repository>
+    </distributionManagement>
 </project>

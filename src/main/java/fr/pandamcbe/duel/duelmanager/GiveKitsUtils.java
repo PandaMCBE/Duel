@@ -1,10 +1,11 @@
 package fr.pandamcbe.duel.duelmanager;
 
-import fr.pandamcbe.duel.Duel;
 import fr.pandamcbe.duel.arenas.DuelArena;
+import fr.pandamcbe.mGConstructorAPI.MGConstructorAPI;
+import fr.pandamcbe.mGConstructorAPI.Team;
 import fr.pandamcbe.mgapi.serverutilapi.enums_strings.AllNames;
 import fr.pandamcbe.mgapi.serverutilapi.utils.items.ItemBuilder;
-import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -15,8 +16,7 @@ public class GiveKitsUtils {
 
     public GiveKitsUtils (DuelArena arena, Player pls) {
 
-        if (arena.getDuelMode().equalsIgnoreCase(AllNames.BUILDUHC.getName())) {
-            Bukkit.getScheduler().runTask(Duel.getInstance(), () -> {
+        if (arena.getMode().equalsIgnoreCase(AllNames.BUILDUHC.getName())) {
                 pls.getInventory().addItem(new ItemBuilder(Material.STONE_SWORD).makeUnbreakable().toItemStack());
                 pls.getInventory().setItem(8, new ItemBuilder(Material.GOLDEN_APPLE, 1).toItemStack());
                 ItemStack casque = new ItemBuilder(Material.LEATHER_HELMET).makeUnbreakable().toItemStack();
@@ -28,10 +28,8 @@ public class GiveKitsUtils {
                 pls.getInventory().setChestplate(plastron);
                 pls.getInventory().setLeggings(jambieres);
                 pls.getInventory().setBoots(bottes);
-            });
         }
-        if (arena.getDuelMode().equalsIgnoreCase(AllNames.SG.getName())) {
-            Bukkit.getScheduler().runTask(Duel.getInstance(), () -> {
+        if (arena.getMode().equalsIgnoreCase(AllNames.SG.getName())) {
                 pls.getInventory().setItem(0, new ItemBuilder(Material.IRON_SWORD).makeUnbreakable().toItemStack());
                 pls.getInventory().setItem(1, new ItemBuilder(Material.FISHING_ROD).makeUnbreakable().toItemStack());
                 pls.getInventory().setItem(2, new ItemBuilder(Material.BOW).makeUnbreakable().toItemStack());
@@ -52,10 +50,8 @@ public class GiveKitsUtils {
                 pls.getInventory().setChestplate(plastron);
                 pls.getInventory().setLeggings(jambieres);
                 pls.getInventory().setBoots(bottes);
-            });
         }
-        if (arena.getDuelMode().equalsIgnoreCase(AllNames.SUMO.getName())) {
-            Bukkit.getScheduler().runTask(Duel.getInstance(), () -> {
+        if (arena.getMode().equalsIgnoreCase(AllNames.SUMO.getName())) {
                 pls.getInventory().setItem(6, new ItemBuilder(Material.STICK).setName("§cOne Punch Stick").setLore("§7Repousse tes énemies vers l'infini", "§7et l'au-delà !").addEnchant(Enchantment.KNOCKBACK, 4).toItemStack());
                 pls.getInventory().setItem(1, new ItemBuilder(Material.FISHING_ROD).setName("§dUltimate PvP Item").setLore("§7Seuls les pros arrivent à faire", "§7qu'un avec leur canne à pêche,", "§7pour nous défoncer, nous,", "§7les noobs xd").makeUnbreakable().toItemStack());
                 pls.getInventory().addItem(new ItemBuilder(Material.GOLDEN_APPLE, 2).toItemStack());
@@ -68,10 +64,8 @@ public class GiveKitsUtils {
                 pls.getInventory().setChestplate(plastron);
                 pls.getInventory().setLeggings(jambieres);
                 pls.getInventory().setBoots(bottes);
-            });
         }
-        if (arena.getDuelMode().equalsIgnoreCase(AllNames.MLGRUSH.getName())) {
-            Bukkit.getScheduler().runTask(Duel.getInstance(), () -> {
+        if (arena.getMode().equalsIgnoreCase(AllNames.MLGRUSH.getName())) {
                 pls.getInventory().setItem(0, new ItemBuilder(Material.STICK).setName("§cOne Punch Stick").setLore("§7Repousse tes énemies vers l'infini", "§7et l'au-delà !").addEnchant(Enchantment.KNOCKBACK, 1).toItemStack());
                 pls.getInventory().setItem(1, new ItemBuilder(Material.IRON_PICKAXE).setName("§bDemolition Tool").setLore("§7Détruis les blocks (sérieux)", "§7pas d'originalité dsl...").makeUnbreakable().toItemStack());
 //                        pls.getInventory().setItem(0, new ItemBuilder(Material.IRON_SWORD).setLore("§7Allez, prends cette arme", "§7et défonce tout le monde.").toItemStack());
@@ -89,20 +83,19 @@ public class GiveKitsUtils {
                 ItemStack jambieres2 = new ItemBuilder(Material.LEATHER_LEGGINGS).setLeatherArmorColor(Color.BLUE).makeUnbreakable().toItemStack();
                 ItemStack bottes2 = new ItemBuilder(Material.LEATHER_BOOTS).setLeatherArmorColor(Color.BLUE).makeUnbreakable().toItemStack();
 
-                if (Duel.getInstance().arenaManager.red.contains(pls.getUniqueId())) {
+            Team team = MGConstructorAPI.getInstance().getTeam();
+            if (team.getSpecificTeam(arena, ChatColor.RED).getUuidList().contains(pls.getUniqueId())) {
                     pls.getInventory().setHelmet(casque);
                     pls.getInventory().setChestplate(plastron);
                     pls.getInventory().setLeggings(jambieres);
                     pls.getInventory().setBoots(bottes);
                 }
-                if (Duel.getInstance().arenaManager.blue.contains(pls.getUniqueId())) {
+                if (team.getSpecificTeam(arena, ChatColor.BLUE).getUuidList().contains(pls.getUniqueId())) {
                     pls.getInventory().setHelmet(casque2);
                     pls.getInventory().setChestplate(plastron2);
                     pls.getInventory().setLeggings(jambieres2);
                     pls.getInventory().setBoots(bottes2);
                 }
-
-            });
         }
     }
 }

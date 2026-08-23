@@ -3,6 +3,7 @@ package fr.pandamcbe.duel.commands;
 import fr.pandamcbe.commons.StatsAccount;
 import fr.pandamcbe.duel.Duel;
 import fr.pandamcbe.mgapi.Main;
+import fr.pandamcbe.mgapi.serverutilapi.enums_strings.AccountType;
 import fr.pandamcbe.mgapi.serverutilapi.enums_strings.AllNames;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -15,7 +16,7 @@ import java.util.UUID;
 public class StatCommand implements CommandExecutor {
 
     private boolean verifyName(String serverName){
-        for(String s : Main.getInstance().serverNames){
+        for(String s : Main.getInstance().getProxyMessaging().askServersName()){
             if(!s.equalsIgnoreCase(AllNames.LOBBY.getName())) {
                 if(serverName.equalsIgnoreCase(s))
                     return true;
@@ -40,7 +41,7 @@ public class StatCommand implements CommandExecutor {
                 if (args.length == 2) {
                     final String serverName = args[0];
                     if(verifyName(serverName)) {
-                        StatsAccount statsAccount = (StatsAccount) Main.getInstance().manipulation.getAccount(Duel.getInstance().mainMap, uuid, AllNames.statsPojo(serverName));
+                        StatsAccount statsAccount = (StatsAccount) Main.getInstance().manipulation.getStatsAccount(Duel.getInstance().mainMap, uuid, AccountType.statsKey(serverName));
 
                         player.sendMessage("§b§lMG-Land> §r§f" + args[1] + " §fa actuellement au " + serverName + ":\n§e" + statsAccount.getCoins() + " §6MGCoins\n§d" + statsAccount.getElos() + " §dMGElos\n§c" + statsAccount.getKills() + " §cMGKills\n§a" + statsAccount.getKillstreaks() + " §aMGKillStreaks\n§b" + statsAccount.getWins() + " §bMGWins");
                     } else {
@@ -51,7 +52,7 @@ public class StatCommand implements CommandExecutor {
                 }if (args.length >= 3) {
                     final String serverName = args[0];
                     if(verifyName(serverName)) {
-                        StatsAccount statsAccount = (StatsAccount) Main.getInstance().manipulation.getAccount(Duel.getInstance().mainMap, uuid, AllNames.statsPojo(serverName));
+                        StatsAccount statsAccount = (StatsAccount) Main.getInstance().manipulation.getStatsAccount(Duel.getInstance().mainMap, uuid, AccountType.statsKey(serverName));
 
 
                         //stats CJFFA[0] PlayerName[1] coins[2] add[3] amount[4]= 5 args

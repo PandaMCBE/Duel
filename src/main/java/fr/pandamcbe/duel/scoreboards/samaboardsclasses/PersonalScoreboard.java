@@ -4,7 +4,7 @@ import fr.pandamcbe.commons.StatsAccount;
 import fr.pandamcbe.duel.Duel;
 import fr.pandamcbe.duel.arenas.DuelArena;
 import fr.pandamcbe.duel.arenas.DuelArenaManager;
-import fr.pandamcbe.mGConstructorAPI.arenas.Team;
+import fr.pandamcbe.mGConstructorAPI.Team;
 import fr.pandamcbe.mgapi.Main;
 import fr.pandamcbe.mgapi.serverutilapi.enums_strings.AllNames;
 import fr.pandamcbe.mgapi.serverutilapi.scoreboards.ObjectiveSign;
