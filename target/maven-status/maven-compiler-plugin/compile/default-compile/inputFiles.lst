@@ -1,11 +1,10 @@
 D:\OneDrive\Programmation_java\MG-Land-Plugin\Duel\src\main\java\fr\pandamcbe\duel\duelmanager\runnables\DuelsRunnable.java
 D:\OneDrive\Programmation_java\MG-Land-Plugin\Duel\src\main\java\fr\pandamcbe\duel\listeners\ArenaListeners.java
+D:\OneDrive\Programmation_java\MG-Land-Plugin\Duel\src\main\java\fr\pandamcbe\duel\rediscommunication\RedisSubCatch.java
 D:\OneDrive\Programmation_java\MG-Land-Plugin\Duel\src\main\java\fr\pandamcbe\duel\Duel.java
-D:\OneDrive\Programmation_java\MG-Land-Plugin\Duel\src\main\java\fr\pandamcbe\duel\rediscommunication\RPbSbUtils.java
 D:\OneDrive\Programmation_java\MG-Land-Plugin\Duel\src\main\java\fr\pandamcbe\duel\arenas\getArenas.java
 D:\OneDrive\Programmation_java\MG-Land-Plugin\Duel\src\main\java\fr\pandamcbe\duel\duelmanager\GiveKitsUtils.java
 D:\OneDrive\Programmation_java\MG-Land-Plugin\Duel\src\main\java\fr\pandamcbe\duel\arenas\DuelArena.java
-D:\OneDrive\Programmation_java\MG-Land-Plugin\Duel\src\main\java\fr\pandamcbe\duel\commands\StatCommand.java
 D:\OneDrive\Programmation_java\MG-Land-Plugin\Duel\src\main\java\fr\pandamcbe\duel\scoreboards\samaboardsclasses\PersonalScoreboard.java
 D:\OneDrive\Programmation_java\MG-Land-Plugin\Duel\src\main\java\fr\pandamcbe\duel\arenas\DuelArenaManager.java
 D:\OneDrive\Programmation_java\MG-Land-Plugin\Duel\src\main\java\fr\pandamcbe\duel\commands\Commands.java

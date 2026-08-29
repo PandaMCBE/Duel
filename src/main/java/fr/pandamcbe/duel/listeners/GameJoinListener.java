@@ -36,6 +36,5 @@ public class GameJoinListener implements Listener {
 
         new DirtyManager().forceSave(Duel.getInstance().mainMap, leaver.getUniqueId());
         Main.getInstance().manipulation.deleteAccount(leaver.getUniqueId(), Duel.getInstance().mainMap);
-
     }
 }
