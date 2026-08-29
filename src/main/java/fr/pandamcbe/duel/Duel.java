@@ -3,7 +3,6 @@ package fr.pandamcbe.duel;
 
 import fr.pandamcbe.duel.arenas.DuelArenaManager;
 import fr.pandamcbe.duel.arenas.getArenas;
-import fr.pandamcbe.duel.commands.StatCommand;
 import fr.pandamcbe.duel.listeners.ArenaListeners;
 import fr.pandamcbe.duel.listeners.GameJoinListener;
 import fr.pandamcbe.duel.rediscommunication.RedisSubCatch;
@@ -26,7 +25,6 @@ public class Duel extends JavaPlugin {
     public getArenas getArenas;
 //    public List<Arena> SGarenas = new ArrayList<>();public List<Arena> BUHCarenas = new ArrayList<>();public List<Arena> SUMOarenas = new ArrayList<>();public List<Arena> MLGRarenas = new ArrayList<>();
     public Set<Player> frozens = new HashSet<>();
-    public List<UUID> waitingPlayers;
     public Map<UUID, Map<String, Object>> mainMap;
     public RedisSubCatch subToChannels;
 
@@ -47,8 +45,6 @@ public class Duel extends JavaPlugin {
         getArenas = new getArenas();
         arenaManager = new DuelArenaManager();
 
-        this.getCommand("stats").setExecutor(new StatCommand());
-
         getServer().getPluginManager().registerEvents(new ArenaListeners(), this);
         getServer().getPluginManager().registerEvents(new GameJoinListener(), this);
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
@@ -66,7 +62,6 @@ public class Duel extends JavaPlugin {
         }
 
         mainMap = new HashMap<>();
-        waitingPlayers = new ArrayList<>();
 
         subToChannels = new RedisSubCatch();
 

@@ -7,7 +7,7 @@ import fr.pandamcbe.duel.duelmanager.runnables.DuelsRunnable;
 import fr.pandamcbe.mGConstructorAPI.MGConstructorAPI;
 import fr.pandamcbe.mGConstructorAPI.Team;
 import fr.pandamcbe.mGConstructorAPI.arenas.Arena;
-import fr.pandamcbe.mGConstructorAPI.arenas.State;
+import fr.pandamcbe.mGConstructorAPI.managers.ArenaManager;
 import fr.pandamcbe.mGConstructorAPI.managers.DuelPlayerManager;
 import fr.pandamcbe.mGConstructorAPI.managers.GameSessionManager;
 import fr.pandamcbe.mgapi.Main;
@@ -20,45 +20,38 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 
 import java.util.List;
-import java.util.UUID;
 
 public class DuelArenaManager extends DuelPlayerManager {
     //La classe est appelée dans l'onEnable donc tout ce qui est hors des méthodes est exécuté au démarrage du plugin
 
     private final Team team = MGConstructorAPI.getInstance().getTeam();
     private final GameSessionManager gameSessionManager = MGConstructorAPI.getInstance().getGameManager();
+    private final ArenaManager arenaManager = MGConstructorAPI.getInstance().getArenaManager();
+
 
     public void customJoinEvent(Player player){
-        gameSessionManager.onPlayersJoin(player);
+        gameSessionManager.clearStuffandHealth(player);
         List<Arena> arenaList = Duel.getInstance().getArenas.getArenaList();
         DuelAccount duelAccount = (DuelAccount) Main.getInstance().manipulation.getAccountFromMemory(Duel.getInstance().mainMap, player.getUniqueId(), DuelAccount.class.getName());
-        lookForArena(arenaList, duelAccount, player);
-    }
-
-    public void JoinArena(UUID uuid, DuelArena nextArena){
-        Player player = Bukkit.getPlayer(uuid);
-        player.getInventory().clear();
-        if (nextArena != null) {
-                nextArena.getInGamePlayers().clear();
-                if (!nextArena.getAlluuids().contains(uuid)) {
-                    nextArena.getAlluuids().add(uuid);
-                    System.out.println("ListPlayer: " + nextArena.getAlluuids().size() + " : " + nextArena.getAlluuids());
-                }
-            team.addPlayer(nextArena, player);
-
-                if (!nextArena.isStarted() && nextArena.getAlluuids().size() == 2) {
-                    gameSessionManager.teleport(nextArena);
-                    DuelsRunnable start = new DuelsRunnable(nextArena, Duel.getInstance());
-                    nextArena.setState(State.PLAYING);
-                    start.runTaskTimer(Duel.getInstance(), 0, 20);
-                }
-                nextArena.getWonRounds().put(uuid, 0);
-        } else {
-            Bukkit.getPlayer(uuid).sendMessage("§b§lMG-Land > §c§lAucune arène n'est disponible :( Revenez plus-tard !");
+        if(duelAccount != null) {
+            arenaManager.lookForArena(arenaList, duelAccount.getGamemode(), Bukkit.getPlayer(duelAccount.getPlayer1UUID()));
+            arenaManager.lookForArena(arenaList, duelAccount.getGamemode(), Bukkit.getPlayer(duelAccount.getPlayer2UUID()));
         }
     }
-    //MLGRUSH
 
+    @Override
+    public void startCountDown(Arena arena) {
+        arena.getAlluuids().forEach(uuid -> arena.getWonRounds().put(uuid, 0));
+        DuelsRunnable start = new DuelsRunnable((DuelArena) arena, Duel.getInstance());
+        start.runTaskTimer(Duel.getInstance(), 0, 20);
+    }
+
+    @Override
+    public String getPrefix(){
+        return "§a§lDuel";
+    }
+
+    //MLGRUSH
 
     public void placingBedInTeamsLoc(DuelArena arena){
         if(arena.getGoalByTeam().get(ChatColor.BLUE).getBlock() != null) {

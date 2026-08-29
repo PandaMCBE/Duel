@@ -8,6 +8,7 @@ import fr.pandamcbe.mGConstructorAPI.Team;
 import fr.pandamcbe.mGConstructorAPI.arenas.Arena;
 import fr.pandamcbe.mGConstructorAPI.arenas.TeamArena;
 import fr.pandamcbe.mGConstructorAPI.managers.GameSessionManager;
+import fr.pandamcbe.mGConstructorAPI.managers.WaitingRoom;
 import fr.pandamcbe.mgapi.Main;
 import fr.pandamcbe.mgapi.core.localmemory.DirtyManager;
 import fr.pandamcbe.mgapi.core.localmemory.MemAccountsManipulation;
@@ -26,13 +27,15 @@ import java.util.UUID;
 
 public class DuelArena extends TeamArena {
 
-    public DuelArena(String DuelMode, Location MiddleSpawnLoc, String name, Integer totalTeams) {
+    public DuelArena(String DuelMode, Location MiddleSpawnLoc, String name, Integer maxPlayers, Integer totalTeams) {
 //        this.locations = new ArrayList<>();
         this.mode = DuelMode;
         this.name = name;
         this.spawnByTeam = new HashMap<>();
+        this.maxPlayersAllowed = maxPlayers;
         this.totalTeams = totalTeams;
         this.middlespawn = MiddleSpawnLoc;
+        this.waitingRoom = new WaitingRoom();
         restart();
     }
 
@@ -59,15 +62,10 @@ public class DuelArena extends TeamArena {
 
     }
 
-    public void ifLastRound(DuelArena duelArena, DuelArenaManager arenaManager) {
-        arenaManager.placingBedInTeamsLoc(duelArena);
-        gameSessionManager.ifLastRoundCoreTeam(duelArena);
-
-    }
-
-    public void nextTeamRound(Arena arena, Team team) {
+    public void nextRound(TeamArena teamArena, Team team) {
+        OnChangingRound(teamArena, team);
         gameSessionManager.nextRoundTeam(Duel.getInstance().getArenas.getArenaList(), team, Duel.getInstance().mainMap, 5, 1);
-        OnChangingRound(arena, team);
+        Duel.getInstance().getArenaManager().placingBedInTeamsLoc((DuelArena) teamArena);
     }
 
     public void customWinEvent(Object o) {
@@ -90,26 +88,22 @@ public class DuelArena extends TeamArena {
                 winner.sendMessage("§7§l+ §d§l2 elos !");
                 winner.sendMessage("§7§l+ §b§l1 win !");
                 winner.sendMessage("§7§l+ §6§l10 coins !");
-
             }
-            Bukkit.broadcastMessage("§a§lDuel > §l" + " §l§r" + team.getString() + " §b§lRemporte le duel ! §6§lGG");
 
             for (UUID uuid : arena.getAlluuids()) {
                 Player pls = Bukkit.getPlayer(uuid);
-                pls.sendMessage("§a§lDuel > §l§3Une nouvelle partie va débuter dans 10s !");
+                pls.sendMessage("§a§lDuel > §l" + " §l§r" + team.getString() + " §b§lRemporte le duel ! §6§lGG");
+//                pls.sendMessage("§a§lDuel > §l§3Une nouvelle partie va débuter dans 10s !");
             }
             gameSessionManager.checkWinCoreTeam(team, Duel.getInstance().getArenas.getArenaList());
         }
     }
     
     public void eliminate(Player victim, List<Arena> list) {
-        DuelArena victimArena = (DuelArena) MGConstructorAPI.getInstance().getArenaManager().getArenaByPlayer(victim.getUniqueId(), list);
-        Team victimTeam = team.getTeamByPlayer(victim, victimArena);
         StatsAccount statsAccount = (StatsAccount) memoryProvider.getStatsAccount(Duel.getInstance().mainMap, victim.getUniqueId(), AccountType.statsKey(serverName));
         statsAccount.setElos(statsAccount.getElos() - 1);
         dirtyManager.markDirty(victim.getUniqueId(), AccountType.statsKey(serverName), statsAccount);
-        victim.sendMessage("§cVous avez perdu ! Gros Noob !");
         victim.sendMessage("§7§l- §d§l1 elo !");
-        gameSessionManager.eliminateCoreTeam(victimTeam, list);
+        gameSessionManager.eliminateTeam(victim.getUniqueId(), list);
     }
 }

@@ -5,6 +5,7 @@ import fr.pandamcbe.duel.arenas.DuelArena;
 import fr.pandamcbe.mGConstructorAPI.MGConstructorAPI;
 import fr.pandamcbe.mgapi.Main;
 import fr.pandamcbe.mgapi.core.localmemory.DirtyManager;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,15 +20,9 @@ public class GameJoinListener implements Listener {
         Player p = event.getPlayer();
          //Association du joueur à son scoreboard
         event.setJoinMessage(null); //Annulation du message par défaut
+        p.setGameMode(GameMode.SPECTATOR);
 
-            p.getInventory().setArmorContents(null); //nettoyer le contenu des slots d'armure
-            //on régéne le poto
-            p.setHealth(20.0);
-//                    p.setGameMode(GameMode.SPECTATOR);
-//                    p.sendMessage("Vous en êtes spectateur. ");
-//                    p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 0));
-
-            Duel.getInstance().arenaManager.customJoinEvent(Duel.getInstance().waitingPlayers, Duel.getInstance().getArenas.getArenaList(), p, "§a§lDuel"); //Appel de la méthode onPlayersJoin de ArenaManager sur le joueur qui se connecte
+        Duel.getInstance().arenaManager.customJoinEvent(p); //Appel de la méthode onPlayersJoin de ArenaManager sur le joueur qui se connecte
 
     }
 

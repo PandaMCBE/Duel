@@ -1,0 +1,13 @@
+fr\pandamcbe\duel\listeners\ArenaListeners$1.class
+fr\pandamcbe\duel\arenas\DuelArena.class
+fr\pandamcbe\duel\arenas\getArenas.class
+fr\pandamcbe\duel\commands\Commands.class
+fr\pandamcbe\duel\listeners\ArenaListeners.class
+fr\pandamcbe\duel\scoreboards\samaboardsclasses\PersonalScoreboard.class
+fr\pandamcbe\duel\listeners\GameJoinListener.class
+fr\pandamcbe\duel\arenas\DuelArenaManager.class
+fr\pandamcbe\duel\rediscommunication\RedisSubCatch.class
+fr\pandamcbe\duel\duelmanager\GiveKitsUtils.class
+fr\pandamcbe\duel\duelmanager\runnables\DuelsRunnable.class
+fr\pandamcbe\duel\rediscommunication\RedisSubCatch$1.class
+fr\pandamcbe\duel\Duel.class

@@ -35,10 +35,11 @@ public class DuelsRunnable extends BukkitRunnable {
     @Override
     public void run() {
 
-            new CountDownsManager(arena).runNewRound(this, duel.waitingPlayers, timer, Sound.CLICK, Sound.NOTE_PLING);
+            new CountDownsManager(arena).runNewRound(this, Duel.getInstance().getArenas.getArenaList(), timer, Sound.CLICK, Sound.NOTE_PLING);
 
 //            if(timer != 0) Bukkit.getScheduler().runTask(Duel.getInstance(), ()->ArenaManager.Teleport(GameArena));
                 if(timer == 5) {
+                    gameSessionManager.teleport(arena);
                     for (UUID uuid : arena.getAlluuids()) {
                         Player p = Bukkit.getPlayer(uuid);
                         Duel.getInstance().getScoreboardManager().onLogin(new PersonalScoreboard(p), p);

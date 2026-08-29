@@ -1,19 +1,11 @@
 package fr.pandamcbe.duel.commands;
 
-import fr.pandamcbe.duel.Duel;
-import fr.pandamcbe.duel.arenas.Arena;
-import org.bukkit.Location;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.Random;
 
 
 public class Commands implements CommandExecutor {

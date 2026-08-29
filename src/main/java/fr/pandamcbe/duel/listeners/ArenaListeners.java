@@ -6,7 +6,6 @@ import fr.pandamcbe.duel.arenas.DuelArena;
 import fr.pandamcbe.mGConstructorAPI.MGConstructorAPI;
 import fr.pandamcbe.mGConstructorAPI.Team;
 import fr.pandamcbe.mGConstructorAPI.arenas.Arena;
-import fr.pandamcbe.mGConstructorAPI.arenas.TeamArena;
 import fr.pandamcbe.mGConstructorAPI.managers.ArenaManager;
 import fr.pandamcbe.mGConstructorAPI.managers.GameSessionManager;
 import fr.pandamcbe.mgapi.Main;
@@ -114,7 +113,7 @@ public class ArenaListeners implements Listener {
                     if (block.getType().equals(Material.BED_BLOCK)) {
                         if (team.getSpecificTeam(arena, ChatColor.BLUE).getUuidList().contains(p.getUniqueId())) {
                             if (block.getLocation().equals(arena.getGoalByTeam().get(ChatColor.BLUE)) || block.getLocation().equals(arena.getGoalByTeam().get(ChatColor.BLUE).clone().add(0, 0, 1))) {
-                                arena.nextTeamRound(arena, playerTeam);
+                                arena.nextRound(arena, playerTeam);
                                 System.out.println("BLUE BED!!");
                             } else {
                                 event.setCancelled(true);
@@ -124,7 +123,7 @@ public class ArenaListeners implements Listener {
                         if (team.getSpecificTeam(arena, ChatColor.RED).getUuidList().contains(p.getUniqueId())) {
                             if (block.getLocation().equals(arena.getGoalByTeam().get(ChatColor.RED)) || block.getLocation().equals(arena.getGoalByTeam().get(ChatColor.RED).clone().add(0, 0, -1))) {
 
-                                arena.nextTeamRound(arena, playerTeam);
+                                arena.nextRound(arena, playerTeam);
                                 System.out.println("RED BED!!");
                             } else {
                                 System.out.println("Breaking Red Cancelled");
@@ -235,9 +234,8 @@ public class ArenaListeners implements Listener {
     void onDeath(PlayerDeathEvent e) {
         Player victim = e.getEntity();
         Player Killer = victim.getKiller();
-        Arena arena = arenaManager.getArenaByPlayer(Killer.getUniqueId(),arenaList);
-        Team victimTeam = team.getTeamByPlayer(victim, (TeamArena) arena);
-        Team killerTeam = team.getTeamByPlayer(Killer, (TeamArena) arena);
+        DuelArena arena = (DuelArena) arenaManager.getArenaByPlayer(Killer.getUniqueId(),arenaList);
+        Team killerTeam = team.getTeamByPlayer(Killer, arena);
         User user1 = Duel.getInstance().luckPerms.getPlayerAdapter(Player.class).getUser(victim);
 
         User user2 = Duel.getInstance().luckPerms.getPlayerAdapter(Player.class).getUser(Killer);
@@ -245,8 +243,8 @@ public class ArenaListeners implements Listener {
         if (victim != Killer) {
             //GLOBAL
             if (!arena.getMode().equalsIgnoreCase(AllNames.MLGRUSH.getName())) {
-                    gameSessionManager.eliminateCoreTeam(victimTeam, arenaList);
-                    gameSessionManager.checkWinCoreTeam(killerTeam, arenaList);
+                    arena.eliminate(victim, arenaList);
+                    arena.customWinEvent(killerTeam);
 
                     StatsAccount statsAccount = (StatsAccount) Main.getInstance().manipulation.getStatsAccount(Duel.getInstance().mainMap, Killer.getUniqueId(), AccountType.statsKey(AllNames.DUELS.getName()));
                     Main.getInstance().gameMechanics.applyKillStreak(statsAccount, Killer, "§a§lDuel > §l");

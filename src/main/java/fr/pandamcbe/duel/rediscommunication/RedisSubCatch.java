@@ -1,6 +1,8 @@
 package fr.pandamcbe.duel.rediscommunication;
 
 import com.google.gson.Gson;
+import fr.pandamcbe.commons.DuelAccount;
+import fr.pandamcbe.duel.Duel;
 import fr.pandamcbe.mgapi.Main;
 import fr.pandamcbe.mgapi.core.localmemory.DirtyManager;
 import fr.pandamcbe.mgapi.core.rediscache.RedisAccountsManager;
@@ -25,17 +27,24 @@ public class RedisSubCatch extends RedisPubSubManager {
     public void handleRedisMessage(String channelName, String message) {
         AllNames allNames = AllNames.fromName(channelName);
         RedisMessage redisMessage = gson.fromJson(message, RedisMessage.class);
+        UUID uuid = redisMessage.getUuid();
 
         if (allNames != null) {
-            if (allNames == AllNames.STATSCOMMAND) {
-                UUID uuid = redisMessage.getUuid();
-                String accountName = redisMessage.getString();
-                String json = (String) redisMessage.getObject();
-                if (Main.getInstance().localCacheManager.containsKey(uuid)) {
-                    new DirtyManager().cancelPending(uuid, accountName);
-                    Main.getInstance().manipulation.sendAccountToMemory(Main.getInstance().localCacheManager, uuid, gson.fromJson(json, AccountType.fromName(RedisAccountsManager.ifContainsCategory(accountName)).getType()), accountName);
-                }
+            switch (allNames) {
+                case STATSCOMMAND:
+                    String accountName = redisMessage.getString();
+                    String json = (String) redisMessage.getObject();
+                    if (Main.getInstance().localCacheManager.containsKey(uuid)) {
+                        new DirtyManager().cancelPending(uuid, accountName);
+                        Main.getInstance().manipulation.sendAccountToMemory(Main.getInstance().localCacheManager, uuid, gson.fromJson(json, AccountType.fromName(RedisAccountsManager.ifContainsCategory(accountName)).getType()), accountName);
+                    }
+                    break;
+                case DUEL:
+                    DuelAccount duelAccount = gson.fromJson(redisMessage.getString(), DuelAccount.class);
+                    Main.getInstance().manipulation.sendAccountToMemory(Duel.getInstance().mainMap, uuid, duelAccount, DuelAccount.class.getName());
+                    break;
             }
+
         }
     }
 
