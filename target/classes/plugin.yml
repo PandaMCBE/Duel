@@ -4,6 +4,7 @@ author: PandaMCBE
 main: fr.pandamcbe.duel.Duel
 depend:
   - MGApi
+  - MGConstructorAPI
 commands:
   report:
     description: une commande de report (provisoir)

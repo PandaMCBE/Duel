@@ -32,6 +32,7 @@ public class DuelArena extends TeamArena {
         this.mode = DuelMode;
         this.name = name;
         this.spawnByTeam = new HashMap<>();
+        this.goalByTeam = new HashMap<>();
         this.maxPlayersAllowed = maxPlayers;
         this.totalTeams = totalTeams;
         this.middlespawn = MiddleSpawnLoc;

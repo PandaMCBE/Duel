@@ -19,7 +19,7 @@ public class RedisSubCatch extends RedisPubSubManager {
 
     @Override
     public void subChannels() {
-        String[] channels = {AllNames.STATSCOMMAND.getName()};
+        String[] channels = {AllNames.STATSCOMMAND.getName(), AllNames.DUEL.getName()};
         subCore(channels);
     }
 
