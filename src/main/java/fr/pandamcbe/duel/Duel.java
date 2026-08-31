@@ -26,7 +26,6 @@ public class Duel extends JavaPlugin {
 //    public List<Arena> SGarenas = new ArrayList<>();public List<Arena> BUHCarenas = new ArrayList<>();public List<Arena> SUMOarenas = new ArrayList<>();public List<Arena> MLGRarenas = new ArrayList<>();
     public Set<Player> frozens = new HashSet<>();
     public Map<UUID, Map<String, Object>> mainMap;
-    public RedisSubCatch subToChannels;
 
     private ScheduledExecutorService executorMonoThread;
     private ScheduledExecutorService scheduledExecutorService;
@@ -63,7 +62,8 @@ public class Duel extends JavaPlugin {
 
         mainMap = new HashMap<>();
 
-        subToChannels = new RedisSubCatch();
+        new RedisSubCatch().subChannels();
+
 
     }
 

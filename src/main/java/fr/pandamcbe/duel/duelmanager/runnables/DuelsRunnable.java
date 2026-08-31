@@ -9,8 +9,6 @@ import fr.pandamcbe.mGConstructorAPI.managers.GameSessionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Sound;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -18,7 +16,7 @@ import java.util.UUID;
 
 public class DuelsRunnable extends BukkitRunnable {
 
-    private int timer = 6;
+    private int timer = 5;
 
     public int getTimer() {
         return timer;
@@ -52,10 +50,6 @@ public class DuelsRunnable extends BukkitRunnable {
                     Duel.getInstance().getArenaManager().placingBedInTeamsLoc(arena);
                     for (UUID uuid : arena.getAlluuids()) {
                         Player p = Bukkit.getPlayer(uuid);
-                        for (Entity entity : arena.getMiddlespawn().getWorld().getNearbyEntities(p.getLocation(), 20, 30, 20)) {
-                            if (entity instanceof Item)
-                                entity.remove();
-                        }
                         p.sendMessage("§b§lGO!!");
                         p.playSound(p.getLocation(), Sound.NOTE_PLING, 1.0f, 1.0f);
                         new GiveKitsUtils(arena, p);

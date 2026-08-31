@@ -28,10 +28,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Bed;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 public class ArenaListeners implements Listener {
 
@@ -130,8 +128,8 @@ public class ArenaListeners implements Listener {
                                 event.setCancelled(true);
                             }
                         }
-                        Stream<Entity> beds = block.getWorld().getEntities().stream().filter(entity -> entity.isOnGround() && entity instanceof Bed);
-                        beds.forEach(Entity::remove);
+//                        Stream<Entity> beds = block.getWorld().getEntities().stream().filter(entity -> entity.isOnGround() && entity instanceof Bed);
+//                        beds.forEach(Entity::remove);
                     } else {
                         if (block.getType() == Material.SANDSTONE && block.getData() != 2 || block.getType() != Material.SANDSTONE)
                             event.setCancelled(true);
@@ -142,7 +140,15 @@ public class ArenaListeners implements Listener {
                     break;
                 default:
                     break;
+            }
+        }
 
+        for (Entity entity : block.getWorld().getEntities()) {
+            if (entity.getLocation().getBlockX() == block.getLocation().getBlockX() &&
+                    entity.getLocation().getBlockZ() == block.getLocation().getBlockZ() &&
+                    entity.getLocation().getBlockY() == block.getLocation().getBlockY()) {
+                entity.remove();
+                break;
             }
         }
     }

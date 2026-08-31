@@ -40,7 +40,7 @@ public class RedisSubCatch extends RedisPubSubManager {
                     }
                     break;
                 case DUEL:
-                    DuelAccount duelAccount = gson.fromJson(redisMessage.getString(), DuelAccount.class);
+                    DuelAccount duelAccount = gson.fromJson((String) redisMessage.getObject(), DuelAccount.class);
                     Main.getInstance().manipulation.sendAccountToMemory(Duel.getInstance().mainMap, uuid, duelAccount, DuelAccount.class.getName());
                     break;
             }

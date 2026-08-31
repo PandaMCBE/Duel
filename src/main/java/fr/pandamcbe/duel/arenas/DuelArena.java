@@ -21,6 +21,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -37,6 +38,7 @@ public class DuelArena extends TeamArena {
         this.totalTeams = totalTeams;
         this.middlespawn = MiddleSpawnLoc;
         this.waitingRoom = new WaitingRoom();
+        this.teams = new ArrayList<>();
         restart();
     }
 
