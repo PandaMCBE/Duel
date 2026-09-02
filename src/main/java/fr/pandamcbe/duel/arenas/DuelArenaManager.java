@@ -34,7 +34,9 @@ public class DuelArenaManager extends DuelPlayerManager {
         List<Arena> arenaList = Duel.getInstance().getArenas.getArenaList();
         DuelAccount duelAccount = (DuelAccount) Main.getInstance().manipulation.getAccountFromMemory(Duel.getInstance().mainMap, player.getUniqueId(), DuelAccount.class.getName());
         if(duelAccount != null) {
+            System.out.println(duelAccount.getPlayer1UUID());
             arenaManager.lookForArena(arenaList, duelAccount.getGamemode(), Bukkit.getPlayer(duelAccount.getPlayer1UUID()));
+            System.out.println(duelAccount.getPlayer2UUID());
             arenaManager.lookForArena(arenaList, duelAccount.getGamemode(), Bukkit.getPlayer(duelAccount.getPlayer2UUID()));
         }
     }

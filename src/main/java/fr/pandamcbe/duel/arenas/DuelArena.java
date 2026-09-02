@@ -28,13 +28,14 @@ import java.util.UUID;
 
 public class DuelArena extends TeamArena {
 
-    public DuelArena(String DuelMode, Location MiddleSpawnLoc, String name, Integer maxPlayers, Integer totalTeams) {
+    public DuelArena(String DuelMode, Location MiddleSpawnLoc, String name, Integer maxPlayers, Integer minPlayers, Integer totalTeams) {
 //        this.locations = new ArrayList<>();
         this.mode = DuelMode;
         this.name = name;
         this.spawnByTeam = new HashMap<>();
         this.goalByTeam = new HashMap<>();
         this.maxPlayersAllowed = maxPlayers;
+        this.minimumPlayers = minPlayers;
         this.totalTeams = totalTeams;
         this.middlespawn = MiddleSpawnLoc;
         this.waitingRoom = new WaitingRoom();
