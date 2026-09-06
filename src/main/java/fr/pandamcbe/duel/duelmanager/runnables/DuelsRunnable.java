@@ -33,7 +33,7 @@ public class DuelsRunnable extends BukkitRunnable {
     @Override
     public void run() {
 
-            new CountDownsManager(arena).runNewRound(this, timer, Sound.CLICK, Sound.NOTE_PLING);
+            new CountDownsManager(arena, duel.getArenaManager()).runNewRound(this, timer, Sound.CLICK, Sound.NOTE_PLING);
 
 //            if(timer != 0) Bukkit.getScheduler().runTask(Duel.getInstance(), ()->ArenaManager.Teleport(GameArena));
                 if(timer == 5) {

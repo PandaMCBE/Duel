@@ -8,10 +8,8 @@ import fr.pandamcbe.mGConstructorAPI.MGConstructorAPI;
 import fr.pandamcbe.mGConstructorAPI.Team;
 import fr.pandamcbe.mGConstructorAPI.arenas.Arena;
 import fr.pandamcbe.mGConstructorAPI.managers.ArenaManager;
-import fr.pandamcbe.mGConstructorAPI.managers.DuelPlayerManager;
 import fr.pandamcbe.mGConstructorAPI.managers.GameSessionManager;
 import fr.pandamcbe.mgapi.Main;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -20,8 +18,9 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.UUID;
 
-public class DuelArenaManager extends DuelPlayerManager {
+public class DuelArenaManager extends ArenaManager {
     //La classe est appelée dans l'onEnable donc tout ce qui est hors des méthodes est exécuté au démarrage du plugin
 
     private final Team team = MGConstructorAPI.getInstance().getTeam();
@@ -35,14 +34,16 @@ public class DuelArenaManager extends DuelPlayerManager {
         DuelAccount duelAccount = (DuelAccount) Main.getInstance().manipulation.getAccountFromMemory(Duel.getInstance().mainMap, player.getUniqueId(), DuelAccount.class.getName());
         if(duelAccount != null) {
             System.out.println(duelAccount.getPlayer1UUID());
-            arenaManager.lookForArena(arenaList, duelAccount.getGamemode(), Bukkit.getPlayer(duelAccount.getPlayer1UUID()));
+            arenaManager.lookForArena(this, arenaList, duelAccount.getGamemode(), duelAccount.getPlayer1UUID());
             System.out.println(duelAccount.getPlayer2UUID());
-            arenaManager.lookForArena(arenaList, duelAccount.getGamemode(), Bukkit.getPlayer(duelAccount.getPlayer2UUID()));
+            arenaManager.lookForArena(this, arenaList, duelAccount.getGamemode(), duelAccount.getPlayer2UUID());
+            Main.getInstance().manipulation.sendAccountToMemory(Duel.getInstance().mainMap, duelAccount.getPlayer2UUID(), duelAccount, Duel.class.getName());
         }
     }
 
     @Override
     public void startCountDown(Arena arena) {
+        System.out.println("CountDown called");
         arena.getAlluuids().forEach(uuid -> arena.getWonRounds().put(uuid, 0));
         DuelsRunnable start = new DuelsRunnable((DuelArena) arena, Duel.getInstance());
         start.runTaskTimer(Duel.getInstance(), 0, 20);
@@ -51,6 +52,14 @@ public class DuelArenaManager extends DuelPlayerManager {
     @Override
     public String getPrefix(){
         return "§a§lDuel";
+    }
+
+    public UUID findOpponent(DuelAccount duelAccount, Player p){
+        if(!p.getUniqueId().equals(duelAccount.getPlayer1UUID())){
+            return duelAccount.getPlayer1UUID();
+        } else {
+            return duelAccount.getPlayer2UUID();
+        }
     }
 
     //MLGRUSH

@@ -1,10 +1,13 @@
 package fr.pandamcbe.duel.listeners;
 
+import fr.pandamcbe.commons.DuelAccount;
 import fr.pandamcbe.duel.Duel;
 import fr.pandamcbe.duel.arenas.DuelArena;
 import fr.pandamcbe.mGConstructorAPI.MGConstructorAPI;
 import fr.pandamcbe.mgapi.Main;
 import fr.pandamcbe.mgapi.core.localmemory.DirtyManager;
+import fr.pandamcbe.mgapi.serverutilapi.enums_strings.AllNames;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,6 +35,8 @@ public class GameJoinListener implements Listener {
         Player leaver = event.getPlayer();
         DuelArena arena = (DuelArena) MGConstructorAPI.getInstance().getArenaManager().getArenaByPlayer(leaver.getUniqueId(), Duel.getInstance().getArenas.getArenaList()); //Récupération de l'arène où se trouve le joueur qui quitte
         Duel.getInstance().getArenaManager().playerQuits(arena, leaver); //Appel de la méthode qui va gérer la déconnexion du joueur
+        DuelAccount duelAccount = (DuelAccount) Main.getInstance().manipulation.getAccountFromMemory(Duel.getInstance().mainMap, leaver.getUniqueId(), DuelAccount.class.getName());
+        Main.getInstance().getProxyMessaging().connectToAnotherServer(AllNames.LOBBY.getName(), Bukkit.getPlayer(Duel.getInstance().arenaManager.findOpponent(duelAccount, leaver)));
         // pour l'arène ou le reste des joueurs s'y trouvant
 
         new DirtyManager().forceSave(Duel.getInstance().mainMap, leaver.getUniqueId());
