@@ -36,7 +36,10 @@ public class GameJoinListener implements Listener {
         DuelArena arena = (DuelArena) MGConstructorAPI.getInstance().getArenaManager().getArenaByPlayer(leaver.getUniqueId(), Duel.getInstance().getArenas.getArenaList()); //Récupération de l'arène où se trouve le joueur qui quitte
         Duel.getInstance().getArenaManager().playerQuits(arena, leaver); //Appel de la méthode qui va gérer la déconnexion du joueur
         DuelAccount duelAccount = (DuelAccount) Main.getInstance().manipulation.getAccountFromMemory(Duel.getInstance().mainMap, leaver.getUniqueId(), DuelAccount.class.getName());
-        Main.getInstance().getProxyMessaging().connectToAnotherServer(AllNames.LOBBY.getName(), Bukkit.getPlayer(Duel.getInstance().arenaManager.findOpponent(duelAccount, leaver)));
+        Player lastPlayer = Bukkit.getPlayer(Duel.getInstance().arenaManager.findOpponent(duelAccount, leaver));
+        if(lastPlayer != null) {
+            Main.getInstance().getProxyMessaging().connectToAnotherServer(AllNames.LOBBY.getName(), lastPlayer);
+        }
         // pour l'arène ou le reste des joueurs s'y trouvant
 
         new DirtyManager().forceSave(Duel.getInstance().mainMap, leaver.getUniqueId());

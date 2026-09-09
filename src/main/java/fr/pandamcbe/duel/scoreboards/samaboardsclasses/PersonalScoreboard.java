@@ -47,8 +47,8 @@ public class PersonalScoreboard extends fr.pandamcbe.mgapi.serverutilapi.scorebo
                 this.objectiveSign.setLine(7, ip);
             } else {
                 this.objectiveSign.setLine(1, "§8§m----------------");
-                this.objectiveSign.setLine(2, pTeam.getString() + " §7: §f" + pTeam.getPoints());
-                this.objectiveSign.setLine(3, oTeam.getString() + " §7: §f" + oTeam.getPoints());
+                this.objectiveSign.setLine(2, pTeam.getColor()+pTeam.getString() + " §7: §f" + pTeam.getPoints());
+                this.objectiveSign.setLine(3, oTeam.getColor()+oTeam.getString() + " §7: §f" + oTeam.getPoints());
                 this.objectiveSign.setLine(4, "§7Coins : §f" + profilAccount.getCoins());
                 this.objectiveSign.setLine(5, "§7Elos : §f" + statsAccount.getElos());
                 this.objectiveSign.setLine(6, "§7Kills : §f" + (statsAccount.getKills() + (statsAccount.getKillstreaks() * 5)));

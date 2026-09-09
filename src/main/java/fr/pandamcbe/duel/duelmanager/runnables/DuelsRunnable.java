@@ -59,5 +59,4 @@ public class DuelsRunnable extends BukkitRunnable {
 
             timer--;
         }
-
 }
