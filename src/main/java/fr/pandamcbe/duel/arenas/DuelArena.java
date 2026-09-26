@@ -14,11 +14,8 @@ import fr.pandamcbe.mgapi.core.localmemory.DirtyManager;
 import fr.pandamcbe.mgapi.core.localmemory.MemAccountsManipulation;
 import fr.pandamcbe.mgapi.serverutilapi.enums_strings.AccountType;
 import fr.pandamcbe.mgapi.serverutilapi.enums_strings.AllNames;
-import net.luckperms.api.model.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -28,10 +25,11 @@ import java.util.UUID;
 
 public class DuelArena extends TeamArena {
 
-    public DuelArena(String DuelMode, Location MiddleSpawnLoc, String name, Integer maxPlayers, Integer minPlayers, Integer totalTeams) {
+    public DuelArena(String DuelMode, Location MiddleSpawnLoc, String name, Integer maxRounds, Integer maxPlayers, Integer minPlayers, Integer totalTeams) {
 //        this.locations = new ArrayList<>();
         this.mode = DuelMode;
         this.name = name;
+        this.maxRounds = maxRounds;
         this.spawnByTeam = new HashMap<>();
         this.goalByTeam = new HashMap<>();
         this.maxPlayersAllowed = maxPlayers;
@@ -45,9 +43,9 @@ public class DuelArena extends TeamArena {
 
     private final String serverName = AllNames.DUELS.getName();
     private final GameSessionManager gameSessionManager = MGConstructorAPI.getInstance().getGameManager();
-    private final Team team = MGConstructorAPI.getInstance().getTeam();
+    private final DuelArenaManager duelArenaManager = Duel.getInstance().getArenaManager();
     private final DirtyManager dirtyManager = new DirtyManager();
-    MemAccountsManipulation memoryProvider = Main.getInstance().manipulation;
+    private final MemAccountsManipulation memoryProvider = Main.getInstance().manipulation;
 //MLGRUSH ------------>
 
     private void OnChangingRound(Arena arena, Team team) {
@@ -57,10 +55,10 @@ public class DuelArena extends TeamArena {
             Player winner = Bukkit.getPlayer(uuid);
             winner.sendMessage("§7§l+ §d§l1 elo !");
             winner.sendMessage("§7§l+ §6§l5 coins !");
-            for (Entity entity : arena.getMiddlespawn().getWorld().getNearbyEntities(winner.getLocation(), 20, -10, 20)) {
-                if (entity instanceof Item)
-                    entity.remove();
-            }
+//            for (Entity entity : arena.getMiddlespawn().getWorld().getNearbyEntities(winner.getLocation(), 20, -10, 20)) {
+//                if (entity instanceof Item)
+//                    entity.remove();
+//            }
         }
         arenaManager.breakOrPlace(arena);
 
@@ -68,7 +66,7 @@ public class DuelArena extends TeamArena {
 
     public void nextRound(TeamArena teamArena, Team team) {
         OnChangingRound(teamArena, team);
-        gameSessionManager.nextRoundTeam(Duel.getInstance().getArenas.getArenaList(), team, Duel.getInstance().mainMap, 5, 1);
+        gameSessionManager.nextRoundTeam(duelArenaManager, Duel.getInstance().getArenas.getArenaList(), team, Duel.getInstance().mainMap, 5, 1);
         Duel.getInstance().getArenaManager().placingBedInTeamsLoc((DuelArena) teamArena);
     }
 
@@ -88,7 +86,6 @@ public class DuelArena extends TeamArena {
                 statsAccount.setElos(statsAccount.getElos() + 2);
                 dirtyManager.markDirty(winnerUUID, AccountType.statsKey(serverName),statsAccount);
                 dirtyManager.markDirty(winnerUUID, AccountType.PROFIL.getKeyPrefix(), profilAccount);
-                User user = Duel.getInstance().luckPerms.getPlayerAdapter(Player.class).getUser(winner);
                 winner.sendMessage("§7§l+ §d§l2 elos !");
                 winner.sendMessage("§7§l+ §b§l1 win !");
                 winner.sendMessage("§7§l+ §6§l10 coins !");
@@ -99,7 +96,7 @@ public class DuelArena extends TeamArena {
                 pls.sendMessage("§a§lDuel > §l" + " §l§r" + team.getString() + " §b§lRemporte le duel ! §6§lGG");
 //                pls.sendMessage("§a§lDuel > §l§3Une nouvelle partie va débuter dans 10s !");
             }
-            gameSessionManager.checkWinCoreTeam(team, Duel.getInstance().getArenas.getArenaList());
+            gameSessionManager.checkWinCoreTeam(duelArenaManager, team, Duel.getInstance().getArenas.getArenaList());
         }
     }
     
@@ -108,6 +105,6 @@ public class DuelArena extends TeamArena {
         statsAccount.setElos(statsAccount.getElos() - 1);
         dirtyManager.markDirty(victim.getUniqueId(), AccountType.statsKey(serverName), statsAccount);
         victim.sendMessage("§7§l- §d§l1 elo !");
-        gameSessionManager.eliminateTeam(victim.getUniqueId(), list);
+        gameSessionManager.eliminateTeam(duelArenaManager, victim.getUniqueId(), list);
     }
 }

@@ -36,7 +36,6 @@ public class PersonalScoreboard extends fr.pandamcbe.mgapi.serverutilapi.scorebo
         Team pTeam = team.getTeamByPlayer(player, arena);
         Team oTeam = team.getTeamByPlayer(opponent, arena);
 
-
             if (!arena.getMode().equalsIgnoreCase(AllNames.MLGRUSH.getName())) {
                 this.objectiveSign.setLine(1, "§8§m----------------");
                 this.objectiveSign.setLine(2, "§7Coins : §f" + profilAccount.getCoins());

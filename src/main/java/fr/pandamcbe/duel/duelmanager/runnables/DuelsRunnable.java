@@ -4,9 +4,11 @@ import fr.pandamcbe.duel.Duel;
 import fr.pandamcbe.duel.arenas.DuelArena;
 import fr.pandamcbe.duel.duelmanager.GiveKitsUtils;
 import fr.pandamcbe.duel.scoreboards.samaboardsclasses.PersonalScoreboard;
+import fr.pandamcbe.mGConstructorAPI.Team;
 import fr.pandamcbe.mGConstructorAPI.managers.CountDownsManager;
 import fr.pandamcbe.mGConstructorAPI.managers.GameSessionManager;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -55,6 +57,7 @@ public class DuelsRunnable extends BukkitRunnable {
                         new GiveKitsUtils(arena, p);
                         Duel.getInstance().frozens.remove(p);
                     }
+                    System.out.println("Arena-Name : "+arena.getName()+" | RedLoc:"+ arena.getSpawnByTeam().get(ChatColor.RED)+ " | Red-TrueLoc:"+ Bukkit.getPlayer(new Team().getSpecificTeam(arena, ChatColor.RED).getUuidList().get(0)).getLocation());
                 }
 
             timer--;

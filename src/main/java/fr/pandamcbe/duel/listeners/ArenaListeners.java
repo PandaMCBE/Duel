@@ -3,10 +3,10 @@ package fr.pandamcbe.duel.listeners;
 import fr.pandamcbe.commons.StatsAccount;
 import fr.pandamcbe.duel.Duel;
 import fr.pandamcbe.duel.arenas.DuelArena;
+import fr.pandamcbe.duel.arenas.DuelArenaManager;
 import fr.pandamcbe.mGConstructorAPI.MGConstructorAPI;
 import fr.pandamcbe.mGConstructorAPI.Team;
 import fr.pandamcbe.mGConstructorAPI.arenas.Arena;
-import fr.pandamcbe.mGConstructorAPI.managers.ArenaManager;
 import fr.pandamcbe.mGConstructorAPI.managers.GameSessionManager;
 import fr.pandamcbe.mgapi.Main;
 import fr.pandamcbe.mgapi.serverutilapi.enums_strings.AccountType;
@@ -33,7 +33,7 @@ import java.util.List;
 
 public class ArenaListeners implements Listener {
 
-    private final ArenaManager arenaManager = MGConstructorAPI.getInstance().getArenaManager();
+    private final DuelArenaManager arenaManager = Duel.getInstance().getArenaManager();
     private final GameSessionManager gameSessionManager = MGConstructorAPI.getInstance().getGameManager();
     public List<Arena> arenaList = Duel.getInstance().getArenas.getArenaList();
     private final Team team = new Team();
@@ -72,7 +72,7 @@ public class ArenaListeners implements Listener {
                 Location location = player.getLocation();
 
                 if (location.getY() <= 2) {
-                    gameSessionManager.onDeath(arena, GameMode.ADVENTURE, 2, 0, player);
+                    gameSessionManager.onDeath(arenaManager, arena, GameMode.SURVIVAL, 2, 0, player);
                 }
             }
         }
@@ -109,8 +109,10 @@ public class ArenaListeners implements Listener {
                     break;
                 case MLGRUSH:
                     if (block.getType().equals(Material.BED_BLOCK)) {
-                        if (team.getSpecificTeam(arena, ChatColor.BLUE).getUuidList().contains(p.getUniqueId())) {
-                            if (block.getLocation().equals(arena.getGoalByTeam().get(ChatColor.BLUE)) || block.getLocation().equals(arena.getGoalByTeam().get(ChatColor.BLUE).clone().add(0, 0, 1))) {
+                        if (team.getTeamByPlayer(p, arena).getColor().equals(ChatColor.BLUE)) {
+//                            System.out.println("Block destroyed : "+block.getLocation() + " | goal block : "+ arena.getGoalByTeam().get(ChatColor.RED));
+
+                            if (block.getLocation().equals(arena.getGoalByTeam().get(ChatColor.RED)) || block.getLocation().equals(arena.getGoalByTeam().get(ChatColor.RED).clone().add(0, 0, -1))) {
                                 arena.nextRound(arena, playerTeam);
                                 System.out.println("BLUE BED!!");
                             } else {
@@ -118,8 +120,9 @@ public class ArenaListeners implements Listener {
                                 System.out.println("Breaking Blue Cancelled");
                             }
                         }
-                        if (team.getSpecificTeam(arena, ChatColor.RED).getUuidList().contains(p.getUniqueId())) {
-                            if (block.getLocation().equals(arena.getGoalByTeam().get(ChatColor.RED)) || block.getLocation().equals(arena.getGoalByTeam().get(ChatColor.RED).clone().add(0, 0, -1))) {
+                        if (team.getTeamByPlayer(p, arena).getColor().equals(ChatColor.RED)) {
+
+                            if (block.getLocation().equals(arena.getGoalByTeam().get(ChatColor.BLUE)) || block.getLocation().equals(arena.getGoalByTeam().get(ChatColor.BLUE).clone().add(0, 0, 1))) {
 
                                 arena.nextRound(arena, playerTeam);
                                 System.out.println("RED BED!!");
@@ -261,7 +264,7 @@ public class ArenaListeners implements Listener {
                     statsAccount2.setKillstreaks(0);
                 }
                 //MLGRUSH
-            } else gameSessionManager.onDeath(arena, GameMode.ADVENTURE, 2, 0, victim);
+            } else gameSessionManager.onDeath(arenaManager, arena, GameMode.SURVIVAL, 2, 0, victim);
 
             Bukkit.broadcastMessage("§a§lDuel > §l" + user1.getCachedData().getMetaData().getPrefix() + " §l§r" + victim.getName() + "§6§l s'est fait retourné par §r§l" + user2.getCachedData().getMetaData().getPrefix() + " §l" + Killer.getName());
         }

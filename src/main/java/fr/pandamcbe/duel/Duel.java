@@ -41,8 +41,8 @@ public class Duel extends JavaPlugin {
         instance = this;
         System.out.println("§2[DEBUG] Duel chargé !");
 
-        getArenas = new getArenas();
         arenaManager = new DuelArenaManager();
+        getArenas = new getArenas();
 
         getServer().getPluginManager().registerEvents(new ArenaListeners(), this);
         getServer().getPluginManager().registerEvents(new GameJoinListener(), this);

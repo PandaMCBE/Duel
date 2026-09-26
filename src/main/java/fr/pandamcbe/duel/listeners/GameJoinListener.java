@@ -33,6 +33,7 @@ public class GameJoinListener implements Listener {
     void onQuit(PlayerQuitEvent event){
         event.setQuitMessage(null); //Annulation du message par défaut
         Player leaver = event.getPlayer();
+        Duel.getInstance().getScoreboardManager().onLogout(leaver);
         DuelArena arena = (DuelArena) MGConstructorAPI.getInstance().getArenaManager().getArenaByPlayer(leaver.getUniqueId(), Duel.getInstance().getArenas.getArenaList()); //Récupération de l'arène où se trouve le joueur qui quitte
         Duel.getInstance().getArenaManager().playerQuits(arena, leaver); //Appel de la méthode qui va gérer la déconnexion du joueur
         DuelAccount duelAccount = (DuelAccount) Main.getInstance().manipulation.getAccountFromMemory(Duel.getInstance().mainMap, leaver.getUniqueId(), DuelAccount.class.getName());
