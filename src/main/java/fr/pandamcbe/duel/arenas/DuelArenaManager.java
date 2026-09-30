@@ -28,14 +28,16 @@ public class DuelArenaManager extends ArenaManager {
     private final ArenaManager arenaManager = MGConstructorAPI.getInstance().getArenaManager();
 
 
-    public void customJoinEvent(Player player){
+    public void customJoinEvent(Player player) {
         gameSessionManager.clearStuffandHealth(player);
         List<Arena> arenaList = Duel.getInstance().getArenas.getArenaList();
         DuelAccount duelAccount = (DuelAccount) Main.getInstance().manipulation.getAccountFromMemory(Duel.getInstance().mainMap, player.getUniqueId(), DuelAccount.class.getName());
-        if(duelAccount != null) {
-            arenaManager.lookForArena(this, arenaList, duelAccount.getGamemode(), duelAccount.getPlayer1UUID());
-            arenaManager.lookForArena(this, arenaList, duelAccount.getGamemode(), duelAccount.getPlayer2UUID());
-            Main.getInstance().manipulation.sendAccountToMemory(Duel.getInstance().mainMap, duelAccount.getPlayer2UUID(), duelAccount, DuelAccount.class.getName());
+        if (duelAccount != null) {
+            if (arenaManager.getArenaByPlayer(duelAccount.getPlayer1UUID(), arenaList) == null) {
+                arenaManager.lookForArena(this, arenaList, duelAccount.getGamemode(), duelAccount.getPlayer1UUID());
+                arenaManager.lookForArena(this, arenaList, duelAccount.getGamemode(), duelAccount.getPlayer2UUID());
+                Main.getInstance().manipulation.sendAccountToMemory(Duel.getInstance().mainMap, duelAccount.getPlayer2UUID(), duelAccount, DuelAccount.class.getName());
+            }
         }
     }
 

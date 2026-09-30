@@ -114,10 +114,8 @@ public class ArenaListeners implements Listener {
 
                             if (block.getLocation().equals(arena.getGoalByTeam().get(ChatColor.RED)) || block.getLocation().equals(arena.getGoalByTeam().get(ChatColor.RED).clone().add(0, 0, -1))) {
                                 arena.nextRound(arena, playerTeam);
-                                System.out.println("BLUE BED!!");
                             } else {
                                 event.setCancelled(true);
-                                System.out.println("Breaking Blue Cancelled");
                             }
                         }
                         if (team.getTeamByPlayer(p, arena).getColor().equals(ChatColor.RED)) {
@@ -125,9 +123,7 @@ public class ArenaListeners implements Listener {
                             if (block.getLocation().equals(arena.getGoalByTeam().get(ChatColor.BLUE)) || block.getLocation().equals(arena.getGoalByTeam().get(ChatColor.BLUE).clone().add(0, 0, 1))) {
 
                                 arena.nextRound(arena, playerTeam);
-                                System.out.println("RED BED!!");
                             } else {
-                                System.out.println("Breaking Red Cancelled");
                                 event.setCancelled(true);
                             }
                         }
