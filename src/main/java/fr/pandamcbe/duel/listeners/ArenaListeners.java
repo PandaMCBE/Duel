@@ -17,6 +17,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -29,7 +30,9 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ArenaListeners implements Listener {
 
@@ -37,6 +40,8 @@ public class ArenaListeners implements Listener {
     private final GameSessionManager gameSessionManager = MGConstructorAPI.getInstance().getGameManager();
     public List<Arena> arenaList = Duel.getInstance().getArenas.getArenaList();
     private final Team team = new Team();
+    private final Set<Location> recentBreaks = new HashSet<>();
+
 
     @EventHandler
     void onFoodLevelChange(FoodLevelChangeEvent event) {
@@ -71,7 +76,7 @@ public class ArenaListeners implements Listener {
             if (arena.getMode().equalsIgnoreCase(AllNames.MLGRUSH.getName())) {
                 Location location = player.getLocation();
 
-                if (location.getY() <= 2) {
+                if (location.getY() <= 2 && player.getGameMode() != GameMode.SPECTATOR) {
                     gameSessionManager.onDeath(arenaManager, arena, GameMode.SURVIVAL, 2, 0, player);
                 }
             }
@@ -100,6 +105,7 @@ public class ArenaListeners implements Listener {
         Block block = event.getBlock();
         if (p.getGameMode() == GameMode.CREATIVE)
             return;
+        event.setCancelled(true);
         DuelArena arena = (DuelArena) arenaManager.getArenaByPlayer(p.getUniqueId(), arenaList);
         Team playerTeam = team.getTeamByPlayer(p, arena);
         AllNames allNames = AllNames.fromName(arena.getMode());
@@ -127,12 +133,14 @@ public class ArenaListeners implements Listener {
                                 event.setCancelled(true);
                             }
                         }
-//                        Stream<Entity> beds = block.getWorld().getEntities().stream().filter(entity -> entity.isOnGround() && entity instanceof Bed);
-//                        beds.forEach(Entity::remove);
                     } else {
-                        if (block.getType() == Material.SANDSTONE && block.getData() != 2 || block.getType() != Material.SANDSTONE)
+                        if (block.getType() == Material.SANDSTONE && block.getData() != 2 ||block.getType() != Material.SANDSTONE) {
                             event.setCancelled(true);
+                        }
                     }
+//                    block.setType(Material.AIR);
+                    recentBreaks.add(event.getBlock().getLocation());
+
                     break;
                 case SG:
                     event.setCancelled(true);
@@ -141,16 +149,16 @@ public class ArenaListeners implements Listener {
                     break;
             }
         }
+    }
 
-        for (Entity entity : block.getWorld().getEntities()) {
-            if (entity.getLocation().getBlockX() == block.getLocation().getBlockX() &&
-                    entity.getLocation().getBlockZ() == block.getLocation().getBlockZ() &&
-                    entity.getLocation().getBlockY() == block.getLocation().getBlockY()) {
-                entity.remove();
-                break;
-            }
+    @EventHandler
+    public void onItemSpawn(ItemSpawnEvent event) {
+        Location loc = event.getLocation().getBlock().getLocation();
+        if (recentBreaks.remove(loc)) {
+            event.setCancelled(true);
         }
     }
+
     @EventHandler
     void onSleepling(PlayerBedEnterEvent event){
         event.setCancelled(true);
@@ -236,18 +244,32 @@ public class ArenaListeners implements Listener {
    }
 
     @EventHandler
-    void onDeath(PlayerDeathEvent e) {
+    public void onDeath(PlayerDeathEvent e) {
         Player victim = e.getEntity();
         Player Killer = victim.getKiller();
-        DuelArena arena = (DuelArena) arenaManager.getArenaByPlayer(Killer.getUniqueId(),arenaList);
-        Team killerTeam = team.getTeamByPlayer(Killer, arena);
-        User user1 = Duel.getInstance().luckPerms.getPlayerAdapter(Player.class).getUser(victim);
+        System.out.println("Killer : " + Killer + " | victim : " +victim);
 
-        User user2 = Duel.getInstance().luckPerms.getPlayerAdapter(Player.class).getUser(Killer);
+        if (victim.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
+            EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) victim.getLastDamageCause();
+            Entity damager = damageEvent.getDamager();
+            // If the damager is a projectile (arrow), get the shooter
+            if (damager instanceof Projectile) {
+                Projectile projectile = (Projectile) damager;
+                if (projectile.getShooter() instanceof Player) {
+                    Killer = (Player) projectile.getShooter();
+                }
+            }
+            if (Killer != null) {
+                DuelArena arena = (DuelArena) arenaManager.getArenaByPlayer(Killer.getUniqueId(), arenaList);
+                Team killerTeam = team.getTeamByPlayer(Killer, arena);
+                User user1 = Duel.getInstance().luckPerms.getPlayerAdapter(Player.class).getUser(victim);
 
-        if (victim != Killer) {
-            //GLOBAL
-            if (!arena.getMode().equalsIgnoreCase(AllNames.MLGRUSH.getName())) {
+                User user2 = Duel.getInstance().luckPerms.getPlayerAdapter(Player.class).getUser(Killer);
+
+                //GLOBAL
+                System.out.println(arena.getMode());
+                if (!arena.getMode().equalsIgnoreCase(AllNames.MLGRUSH.getName())) {
+                    System.out.println("eliminate and win");
                     arena.eliminate(victim, arenaList);
                     arena.customWinEvent(killerTeam);
 
@@ -255,17 +277,16 @@ public class ArenaListeners implements Listener {
                     Main.getInstance().gameMechanics.applyKillStreak(statsAccount, Killer, "§a§lDuel > §l");
 
                     StatsAccount statsAccount2 = (StatsAccount) Main.getInstance().manipulation.getStatsAccount(Duel.getInstance().mainMap, victim.getUniqueId(), AccountType.statsKey(AllNames.DUELS.getName()));
-                    if(statsAccount2.getKillstreaks() > 1) {
-                    victim.sendMessage("§c§lVous avez perdu vos KillStreaks!");
-                    statsAccount2.setKillstreaks(0);
-                }
-                //MLGRUSH
-            } else gameSessionManager.onDeath(arenaManager, arena, GameMode.SURVIVAL, 2, 0, victim);
+                    if (statsAccount2.getKillstreaks() > 1) {
+                        victim.sendMessage("§c§lVous avez perdu vos KillStreaks!");
+                        statsAccount2.setKillstreaks(0);
+                    }
+                    //MLGRUSH
+                } else gameSessionManager.onDeath(arenaManager, arena, GameMode.SURVIVAL, 2, 0, victim);
 
-            Bukkit.broadcastMessage("§a§lDuel > §l" + user1.getCachedData().getMetaData().getPrefix() + " §l§r" + victim.getName() + "§6§l s'est fait retourné par §r§l" + user2.getCachedData().getMetaData().getPrefix() + " §l" + Killer.getName());
+                Bukkit.broadcastMessage("§a§lDuel > §l" + user1.getCachedData().getMetaData().getPrefix() + " §l§r" + victim.getName() + "§6§l s'est fait retourné par §r§l" + user2.getCachedData().getMetaData().getPrefix() + " §l" + Killer.getName());
+            }
+            victim.spigot().respawn();
         }
-
-        e.getDrops().clear();
-        victim.spigot().respawn();
     }
 }

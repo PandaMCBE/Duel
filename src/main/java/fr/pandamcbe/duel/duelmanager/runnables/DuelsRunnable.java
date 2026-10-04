@@ -53,6 +53,7 @@ public class DuelsRunnable extends BukkitRunnable {
                         p.sendMessage("§b§lGO!!");
                         p.playSound(p.getLocation(), Sound.NOTE_PLING, 1.0f, 1.0f);
                         new GiveKitsUtils(arena, p);
+                        p.updateInventory();
                         Duel.getInstance().frozens.remove(p);
                     }
                     System.out.println("Arena-Name : "+arena.getName());

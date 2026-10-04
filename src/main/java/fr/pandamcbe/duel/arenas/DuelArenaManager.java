@@ -10,6 +10,7 @@ import fr.pandamcbe.mGConstructorAPI.arenas.Arena;
 import fr.pandamcbe.mGConstructorAPI.managers.ArenaManager;
 import fr.pandamcbe.mGConstructorAPI.managers.GameSessionManager;
 import fr.pandamcbe.mgapi.Main;
+import fr.pandamcbe.mgapi.serverutilapi.enums_strings.AllNames;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -65,30 +66,32 @@ public class DuelArenaManager extends ArenaManager {
     //MLGRUSH
 
     public void placingBedInTeamsLoc(DuelArena arena){
-        if(arena.getGoalByTeam().get(ChatColor.BLUE).getBlock() != null) {
-            Block blue_bed = arena.goalByTeam.get(ChatColor.BLUE).getBlock();
-            BlockState bedFoot = blue_bed.getRelative(blue_bed.getFace(blue_bed)).getState();
-            BlockState bedHead = bedFoot.getBlock().getRelative(BlockFace.SOUTH).getState();
-            bedFoot.setType(Material.BED_BLOCK);
-            bedHead.setType(Material.BED_BLOCK);
-            bedFoot.setRawData((byte) 0x0);
-            bedHead.setRawData((byte) 0x8);
-            bedFoot.update(true, false);
-            bedHead.update(true, true);
-        }
+        if(arena.getMode().equalsIgnoreCase(AllNames.MLGRUSH.getName())) {
+            if (arena.getGoalByTeam().get(ChatColor.BLUE).getBlock() != null) {
+                Block blue_bed = arena.goalByTeam.get(ChatColor.BLUE).getBlock();
+                BlockState bedFoot = blue_bed.getRelative(blue_bed.getFace(blue_bed)).getState();
+                BlockState bedHead = bedFoot.getBlock().getRelative(BlockFace.SOUTH).getState();
+                bedFoot.setType(Material.BED_BLOCK);
+                bedHead.setType(Material.BED_BLOCK);
+                bedFoot.setRawData((byte) 0x0);
+                bedHead.setRawData((byte) 0x8);
+                bedFoot.update(true, false);
+                bedHead.update(true, true);
+            }
 
 //        BlockState bedFoot2 = arena.getRed_bed().getBlock().getRelative(arena.getRed_bed().getBlock().getFace(arena.getRed_bed().getBlock())).getState();
 //        BlockState bedHead2 = bedFoot.getBlock().getRelative(BlockFace.SOUTH).getState();
-        if(arena.getGoalByTeam().get(ChatColor.RED).getBlock() != null) {
-            Block red_bed = arena.goalByTeam.get(ChatColor.RED).getBlock();
-            BlockState bedHead2 = red_bed.getRelative(red_bed.getFace(red_bed)).getState();
-            BlockState bedFoot2 = bedHead2.getBlock().getRelative(BlockFace.NORTH).getState();
-            bedFoot2.setType(Material.BED_BLOCK);
-            bedHead2.setType(Material.BED_BLOCK);
-            bedFoot2.setRawData((byte) 0x0);
-            bedHead2.setRawData((byte) 0x8);
-            bedFoot2.update(true, false);
-            bedHead2.update(true, true);
+            if (arena.getGoalByTeam().get(ChatColor.RED).getBlock() != null) {
+                Block red_bed = arena.goalByTeam.get(ChatColor.RED).getBlock();
+                BlockState bedHead2 = red_bed.getRelative(red_bed.getFace(red_bed)).getState();
+                BlockState bedFoot2 = bedHead2.getBlock().getRelative(BlockFace.NORTH).getState();
+                bedFoot2.setType(Material.BED_BLOCK);
+                bedHead2.setType(Material.BED_BLOCK);
+                bedFoot2.setRawData((byte) 0x0);
+                bedHead2.setRawData((byte) 0x8);
+                bedFoot2.update(true, false);
+                bedHead2.update(true, true);
+            }
         }
     }
 
